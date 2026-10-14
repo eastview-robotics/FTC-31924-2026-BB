@@ -50,6 +50,7 @@ import com.qualcomm.robotcore.util.Range;
 import android.util.Size;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 //import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.vision.VisionPortal;
@@ -156,7 +157,7 @@ public class TeleOp1 extends OpMode {
 
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-    private static final boolean USE_WEBCAM = false;
+    private static final boolean USE_WEBCAM = true;
     private AprilTagDetection desiredTag = null;     // Used to hold the data for a detected AprilTag
 
     private double servoAngle;
@@ -276,7 +277,7 @@ public class TeleOp1 extends OpMode {
 
         // Set the camera (webcam vs. built-in RC phone camera).
         if (USE_WEBCAM) {
-           // builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
+           builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
         } else {
             builder.setCamera(BuiltinCameraDirection.BACK);
         }
@@ -285,7 +286,7 @@ public class TeleOp1 extends OpMode {
         builder.setCameraResolution(new Size(640, 480));
 
         // Enable the RC preview (LiveView).  Set "false" to omit camera monitoring.
-        //builder.enableLiveView(true);
+        builder.enableLiveView(true);
 
         // Set the stream format; MJPEG uses less bandwidth than default YUY2.
         //builder.setStreamFormat(VisionPortal.StreamFormat.YUY2);
@@ -302,7 +303,7 @@ public class TeleOp1 extends OpMode {
         visionPortal = builder.build();
 
         // Disable or re-enable the aprilTag processor at any time.
-        //visionPortal.setProcessorEnabled(aprilTag, true);
+        visionPortal.setProcessorEnabled(aprilTag, true);
 
         /*
          * Tell the driver that initialization is complete.
@@ -351,25 +352,25 @@ public class TeleOp1 extends OpMode {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
 
-//        for (AprilTagDetection detection : currentDetections) {
-//            // Look to see if we have size info on this tag.
-//            if (detection.metadata != null) {
-//                //  Check to see if we want to track towards this tag.
-//                if ((detection.id == 20 && alliance == Alliance.BLUE) || (detection.id == 24 && alliance == Alliance.RED)) {
-//                    // Yes, we want to use this tag.
-//                    targetFound = true;
-//                    desiredTag = detection;
-//                    break;  // don't look any further.
-//                } else {
-//                    // This tag is in the library, but we do not want to track it right now.
-//                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
-//                    desiredTag = null;
-//                }
-//            } else {
-//                // This tag is NOT in the library, so we don't have enough information to track to it.
-//                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
-//            }
-//        }
+        for (AprilTagDetection detection : currentDetections) {
+            // Look to see if we have size info on this tag.
+            if (detection.metadata != null) {
+                //  Check to see if we want to track towards this tag.
+                if ((detection.id == 20 && alliance == Alliance.BLUE) || (detection.id == 24 && alliance == Alliance.RED)) {
+                    // Yes, we want to use this tag.
+                    targetFound = true;
+                    desiredTag = detection;
+                    break;  // don't look any further.
+                } else {
+                    // This tag is in the library, but we do not want to track it right now.
+                    telemetry.addData("Skipping", "Tag ID %d is not desired", detection.id);
+                    desiredTag = null;
+                }
+            } else {
+                // This tag is NOT in the library, so we don't have enough information to track to it.
+                telemetry.addData("Unknown", "Tag ID %d is not in TagLibrary", detection.id);
+            }
+        }
 
         // Tell the driver what we see, and what to do.
 //        if (targetFound) {
@@ -457,7 +458,7 @@ public class TeleOp1 extends OpMode {
     void arcadeDrive(double forward, double strafe, double rotate) {
         leftFrontPower = forward + strafe + rotate;
         rightFrontPower = forward - strafe - rotate;
-        leftBackPower = forward - strafe - rotate;
+        leftBackPower = forward - strafe + rotate;
         rightBackPower = forward + strafe - rotate;
 
         // Normalize motor powers to ensure they are within the -1.0 to 1.0 range

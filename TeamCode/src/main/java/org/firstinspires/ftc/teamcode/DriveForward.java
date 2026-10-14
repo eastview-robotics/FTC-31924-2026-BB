@@ -328,7 +328,7 @@ public class DriveForward extends OpMode {
     void arcadeDrive(double forward, double strafe, double rotate) {
         leftFrontPower = forward + strafe + rotate;
         rightFrontPower = forward - strafe - rotate;
-        leftBackPower = forward - strafe - rotate;
+        leftBackPower = forward - strafe + rotate;
         rightBackPower = forward + strafe - rotate;
 
         // Normalize motor powers to ensure they are within the -1.0 to 1.0 range
